@@ -22,7 +22,7 @@ class k3s::install {
     mode   => '0755',
   }
 
-  $token = pick($k3s::token, fqdn_rand_string(32))
+  $token = pick($k3s::token, stdlib::fqdn_rand_string(32))
 
   file { ['/etc/rancher', '/etc/rancher/k3s']:
     ensure => directory,
@@ -31,7 +31,7 @@ class k3s::install {
   file { $kubelet_config_path:
     ensure  => file,
     mode    => '0644',
-    content => to_yaml(merge({
+    content => stdlib::to_yaml(merge({
       'apiVersion' => 'kubelet.config.k8s.io/v1beta1',
       'kind'       => 'KubeletConfiguration',
     }, $k3s::kubelet_config)),
@@ -43,7 +43,7 @@ class k3s::install {
   file { $k3s_config_path:
     ensure  => file,
     mode    => '0600',
-    content => to_yaml(merge({
+    content => stdlib::to_yaml(merge({
       'token'       => $token,
       'server'      => $k3s::server,
       'kubelet-arg' => "config=${kubelet_config_path}"
